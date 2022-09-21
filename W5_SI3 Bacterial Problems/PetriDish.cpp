@@ -16,11 +16,18 @@ void PetriDish::displayDish()
 		}
 		std::cout << std::endl;
 	}
+	bacillus = 0;
+	coccus = 0;
+	spirillum = 0;
+	bacterium = 0;
+	counterBacterial();
+	printNumberOfBactirum();
 }
 
 
 void PetriDish::initializeBoard()
 {
+	//srand(time(0));
 	int xPos{ 0 }, yPos{ 0 };
 	for (auto& e : dish) {
 		for (auto& k : e) {
@@ -240,6 +247,70 @@ void PetriDish::counterBacterial()
 			else if (e->getBacteriumSign() == '.')
 				bacterium++;
 
+		}
+	}
+}
+
+void PetriDish::printNumberOfBactirum() {
+	std::cout << "Bacillus: " << bacillus << std::endl;
+	std::cout << "Coccus: " << coccus << std::endl;
+	std::cout << "Spirillum: " << spirillum << std::endl;
+	std::cout << "Empty spaces: " << bacterium << std::endl;
+}
+
+void PetriDish::bacteriaPovielations() {
+	for (size_t xDish{ 0 }; xDish < dish.size(); xDish++) {
+		for (size_t yDish{ 0 }; yDish < dish.size(); yDish++) {
+
+			if (dish[xDish][yDish]->getBacteriumSign() != '.' && dish[xDish][yDish]->getIsAlive() == true) {
+				std::vector<std::pair<int, int>> freeCoordinates;
+				if (isInRange(xDish - 1, yDish) &&
+					dish[xDish - 1][yDish]->getBacteriumSign() == '.')
+					freeCoordinates.push_back(std::make_pair(xDish - 1, yDish));
+				if (isInRange(xDish + 1, yDish) &&
+					dish[xDish + 1][yDish]->getBacteriumSign() == '.')
+					freeCoordinates.push_back(std::make_pair(xDish + 1, yDish));
+				if (isInRange(xDish, yDish + 1) &&
+					dish[xDish][yDish + 1]->getBacteriumSign() == '.')
+					freeCoordinates.push_back(std::make_pair(xDish, yDish + 1));
+				if (isInRange(xDish, yDish - 1) &&
+					dish[xDish][yDish - 1]->getBacteriumSign() == '.')
+					freeCoordinates.push_back(std::make_pair(xDish, yDish - 1));
+
+				if (freeCoordinates.size() != 0) {
+					std::pair<int, int> choosenCoordinates = freeCoordinates[randonPositionNumber(freeCoordinates.size())];
+
+					if (dish[xDish][yDish]->getBacteriumSign() == 'C') {
+						dish[choosenCoordinates.first][choosenCoordinates.second] = std::make_shared<Coccus>();
+						dish[choosenCoordinates.first][choosenCoordinates.second]->setIsAlive(false);
+					}
+					else if (dish[xDish][yDish]->getBacteriumSign() == 'B') {
+						dish[choosenCoordinates.first][choosenCoordinates.second] = std::make_shared<Bacillus>();
+						dish[choosenCoordinates.first][choosenCoordinates.second]->setIsAlive(false);
+					}
+					else if (dish[xDish][yDish]->getBacteriumSign() == 'S') {
+						dish[choosenCoordinates.first][choosenCoordinates.second] = std::make_shared<Spirillum>();
+						dish[choosenCoordinates.first][choosenCoordinates.second]->setIsAlive(false);
+					}
+				}
+			}
+		}
+	}
+
+}
+
+int PetriDish::randonPositionNumber(size_t sizeOfVectorPairs)
+{
+	return rand() % sizeOfVectorPairs;
+}
+
+void PetriDish::frankenstein() {
+	for (size_t xDish{ 0 }; xDish < dish.size(); xDish++) {
+		for (size_t yDish{ 0 }; yDish < dish.size(); yDish++) {
+
+			if (dish[xDish][yDish]->getIsAlive() == false) {
+				dish[xDish][yDish]->setIsAlive(true);
+			}
 		}
 	}
 }
